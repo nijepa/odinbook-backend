@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
@@ -14,18 +14,18 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-    comments: [ { type: mongoose.Schema.Types.ObjectId, ref: 'Comment'} ],
-    likes: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User'} ]
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    comments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
+    likes: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 /* If post deleted remove all comments on post */
-postSchema.pre('remove', function(next) {
-  this.model('Comment').deleteMany({ comments: this._id }, next);
+postSchema.pre("remove", function (next) {
+  this.model("Comment").deleteMany({ comments: this._id }, next);
 });
 
-const Post = mongoose.model('Post', postSchema);
+const Post = mongoose.model("Post", postSchema);
 
 export default Post;
