@@ -1,6 +1,28 @@
 import Post from "../models/post.js";
 
 /* List of all posts */
+const post_all = async (req, res) => {
+  const posts = await req.context.models.Post.find()
+    .populate("post")
+    .populate({
+      path: "comments",
+      select: "text createdAt likes",
+      populate: {
+        path: "author",
+        select:
+          "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+      },
+    })
+    .populate(
+      "user",
+      "username email first_name last_name picture isSocial friends likes createdAt name user_about"
+    )
+    
+    const favs = posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 7)
+  return res.send(favs);
+};
+
+/* List of posts for page */
 const post_list = async (req, res) => {
   //const resultsPerPage = 5;
   //let page = req.params.page >= 1 ? req.params.page : 1;
@@ -249,6 +271,7 @@ const post_delete = async (req, res) => {
 };
 
 export {
+  post_all,
   post_list,
   post_user_list,
   post_one,

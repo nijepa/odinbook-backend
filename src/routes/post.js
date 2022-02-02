@@ -1,5 +1,6 @@
 import Router from "express";
 import {
+  post_all,
   post_list,
   post_user_list,
   post_one,
@@ -17,6 +18,7 @@ import auth from "../middleware/auth.js";
 const router = Router();
 
 /* List of all posts */
+router.get("/", post_all)
 router.get("/:page", post_list);
 router.get("/user/:userId", post_user_list);
 router.get("/:postId", post_one);
