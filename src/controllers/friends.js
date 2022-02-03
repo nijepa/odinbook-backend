@@ -6,14 +6,20 @@ const getFriends = async (req, res) => {
   try {
     let id = req.params._id;
     let user = await User.aggregate([
-      { $match: { _id: mongodb.ObjectId(id) } },
+      {
+        $match: {
+          _id: mongodb.ObjectId(id),
+        },
+      },
       {
         $project: {
           shapes: {
             $filter: {
               input: "$friends",
               as: "friend",
-              cond: { $eq: ["$$friend.status", 1] },
+              cond: {
+                $eq: ["$$friend.status", 1],
+              },
             },
           },
           _id: 0, //0 means do not show the field
@@ -72,8 +78,12 @@ const notFriends = async (req, res) => {
   try {
     let id = req.params._id;
     let users = await User.find({
-      _id: { $ne: id },
-      "friends.user": { $nin: id },
+      _id: {
+        $ne: id,
+      },
+      "friends.user": {
+        $nin: id,
+      },
     }).select({
       name: 1,
       _id: 1,
@@ -102,14 +112,20 @@ const getFriendRequests = async (req, res) => {
   try {
     let id = req.params._id;
     let user = await User.aggregate([
-      { $match: { _id: mongodb.ObjectId(id) } },
+      {
+        $match: {
+          _id: mongodb.ObjectId(id),
+        },
+      },
       {
         $project: {
           shapes: {
             $filter: {
               input: "$friends",
               as: "friend",
-              cond: { $eq: ["$$friend.status", 0] },
+              cond: {
+                $eq: ["$$friend.status", 0],
+              },
             },
           },
           _id: 0, //0 means do not show the field
@@ -168,14 +184,20 @@ const getFriendInvitations = async (req, res) => {
   try {
     let id = req.params._id;
     let user = await User.aggregate([
-      { $match: { _id: mongodb.ObjectId(id) } },
+      {
+        $match: {
+          _id: mongodb.ObjectId(id),
+        },
+      },
       {
         $project: {
           shapes: {
             $filter: {
               input: "$friends",
               as: "friend",
-              cond: { $eq: ["$$friend.status", 2] },
+              cond: {
+                $eq: ["$$friend.status", 2],
+              },
             },
           },
           _id: 0, //0 means do not show the field
@@ -233,13 +255,31 @@ const getFriendInvitations = async (req, res) => {
 const requestFriend = async (req, res) => {
   try {
     let friend = await User.findOneAndUpdate(
-      { _id: req.params._id },
-      { $push: { friends: { user: req.body.friend_id, status: 0 } } }
+      {
+        _id: req.params._id,
+      },
+      {
+        $push: {
+          friends: {
+            user: req.body.friend_id,
+            status: 0,
+          },
+        },
+      }
     );
 
     let newFriend = await User.findOneAndUpdate(
-      { _id: req.body.friend_id },
-      { $push: { friends: { user: req.params._id, status: 2 } } }
+      {
+        _id: req.body.friend_id,
+      },
+      {
+        $push: {
+          friends: {
+            user: req.params._id,
+            status: 2,
+          },
+        },
+      }
     ).select({
       name: 1,
       _id: 1,
@@ -265,12 +305,28 @@ const requestFriend = async (req, res) => {
 const abortRequestFriend = async (req, res) => {
   try {
     let friend = await User.findOneAndUpdate(
-      { _id: req.params._id },
-      { $pull: { friends: { user: req.body.friend_id } } }
+      {
+        _id: req.params._id,
+      },
+      {
+        $pull: {
+          friends: {
+            user: req.body.friend_id,
+          },
+        },
+      }
     );
     let newFriend = await User.findOneAndUpdate(
-      { _id: req.body.friend_id },
-      { $pull: { friends: { user: req.params._id } } }
+      {
+        _id: req.body.friend_id,
+      },
+      {
+        $pull: {
+          friends: {
+            user: req.params._id,
+          },
+        },
+      }
     ).select({
       name: 1,
       _id: 1,
@@ -298,16 +354,32 @@ const acceptFriendInvitation = async (req, res) => {
     let friend = await User.findOneAndUpdate(
       {
         _id: req.params._id,
-        friends: { $elemMatch: { user: req.body.friend_id } },
+        friends: {
+          $elemMatch: {
+            user: req.body.friend_id,
+          },
+        },
       },
-      { $set: { "friends.$.status": 1 } }
+      {
+        $set: {
+          "friends.$.status": 1,
+        },
+      }
     );
     let newFriend = await User.findOneAndUpdate(
       {
         _id: req.body.friend_id,
-        friends: { $elemMatch: { user: req.params._id } },
+        friends: {
+          $elemMatch: {
+            user: req.params._id,
+          },
+        },
       },
-      { $set: { "friends.$.status": 1 } }
+      {
+        $set: {
+          "friends.$.status": 1,
+        },
+      }
     ).select({
       name: 1,
       _id: 1,
@@ -333,12 +405,28 @@ const acceptFriendInvitation = async (req, res) => {
 const unFriend = async (req, res) => {
   try {
     let friend = await User.findOneAndUpdate(
-      { _id: req.params._id },
-      { $pull: { friends: { user: req.body.friend_id } } }
+      {
+        _id: req.params._id,
+      },
+      {
+        $pull: {
+          friends: {
+            user: req.body.friend_id,
+          },
+        },
+      }
     );
     let newFriend = await User.findOneAndUpdate(
-      { _id: req.body.friend_id },
-      { $pull: { friends: { user: req.params._id } } }
+      {
+        _id: req.body.friend_id,
+      },
+      {
+        $pull: {
+          friends: {
+            user: req.params._id,
+          },
+        },
+      }
     ).select({
       name: 1,
       _id: 1,

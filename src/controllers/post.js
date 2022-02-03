@@ -9,19 +9,18 @@ const post_all = async (req, res) => {
       select: "text createdAt likes",
       populate: {
         path: "author",
-        select:
-          "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+        select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
       },
     })
     .populate(
       "user",
       "username email first_name last_name picture isSocial friends likes createdAt name user_about"
     )
-    
-    const favs = posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 7)
+
+  const favs = posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 7)
   return res.send(favs);
 };
-
+/* *************************************************************************************************** */
 /* List of posts for page */
 const post_list = async (req, res) => {
   //const resultsPerPage = 5;
@@ -36,15 +35,16 @@ const post_list = async (req, res) => {
       select: "text createdAt likes",
       populate: {
         path: "author",
-        select:
-          "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+        select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
       },
     })
     .populate(
       "user",
       "username email first_name last_name picture isSocial friends likes createdAt name user_about"
     )
-    .sort([["createdAt", -1]])
+    .sort([
+      ["createdAt", -1]
+    ])
     .limit(resultsPerPage)
     .skip(resultsPerPage * page)
     .exec((err, doc) => {
@@ -65,18 +65,19 @@ const post_list = async (req, res) => {
     });
   //return res.send(posts);
 };
-
+/* *************************************************************************************************** */
 /* List of user posts */
 const post_user_list = async (req, res) => {
-  const posts = await req.context.models.Post.find({ user: req.params.userId })
+  const posts = await req.context.models.Post.find({
+      user: req.params.userId
+    })
     .populate("post")
     .populate({
       path: "comments",
       select: "text createdAt likes",
       populate: {
         path: "author",
-        select:
-          "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+        select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
       },
     })
     .populate(
@@ -85,12 +86,26 @@ const post_user_list = async (req, res) => {
     );
   return res.send(posts);
 };
-
+/* *************************************************************************************************** */
+/* One post */
 const post_one = async (req, res) => {
-  const post = await req.context.models.Post.findById(req.params.postId);
+  const post = await req.context.models.Post.findById(req.params.postId)
+    .populate("post")
+    .populate({
+      path: "comments",
+      select: "text createdAt likes",
+      populate: {
+        path: "author",
+        select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+      },
+    })
+    .populate(
+      "user",
+      "username email first_name last_name picture isSocial friends likes createdAt name user_about"
+    );
   return res.send(post);
 };
-
+/* *************************************************************************************************** */
 /* Create new post */
 const post_add = async (req, res, next) => {
   const post = await req.context.models.Post.create({
@@ -107,7 +122,7 @@ const post_add = async (req, res, next) => {
 
   return res.send(postNew);
 };
-
+/* *************************************************************************************************** */
 /* Create new comment for selected post */
 const post_comment = async (req, res, next) => {
   const comment = await req.context.models.Comment.create({
@@ -116,38 +131,42 @@ const post_comment = async (req, res, next) => {
   }).catch((error) => next(new BadRequestError(error)));
 
   const newCommentId = await req.context.models.Comment.findOne()
-    .sort({ createdAt: -1 })
+    .sort({
+      createdAt: -1
+    })
     .limit(1);
 
-  const post = await req.context.models.Post.updateOne(
-    {
-      _id: req.body.id,
-    },
-    { $push: { comments: newCommentId } }
-  ).catch((error) => next(new BadRequestError(error)));
+  const post = await req.context.models.Post.updateOne({
+    _id: req.body.id,
+  }, {
+    $push: {
+      comments: newCommentId
+    }
+  }).catch((error) => next(new BadRequestError(error)));
 
   const upPost = await req.context.models.Post.findById(req.body.id).populate({
     path: "comments",
     select: "text createdAt likes",
     populate: {
       path: "author",
-      select:
-        "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+      select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
     },
   });
 
   return res.send(upPost);
 };
-
+/* *************************************************************************************************** */
 /* Delete comment */
 const post_comment_delete = async (req, res, next) => {
-  const post = await req.context.models.Post.findOneAndUpdate(
-    {
-      _id: req.body[1].postId,
-    },
-    { $pull: { comments: req.params.commentId } },
-    { new: true }
-  ).catch((error) => next(new BadRequestError(error)));
+  const post = await req.context.models.Post.findOneAndUpdate({
+    _id: req.body[1].postId,
+  }, {
+    $pull: {
+      comments: req.params.commentId
+    }
+  }, {
+    new: true
+  }).catch((error) => next(new BadRequestError(error)));
   const comment = await req.context.models.Comment.findById(
     req.params.commentId
   );
@@ -155,92 +174,109 @@ const post_comment_delete = async (req, res, next) => {
     await comment.remove();
   }
 
-  return res.send({ commentId: comment._id, postId: post._id });
+  return res.send({
+    commentId: comment._id,
+    postId: post._id
+  });
 };
-
+/* *************************************************************************************************** */
 /* Post Like */
 const post_like = async (req, res, next) => {
   const upPost = await req.context.models.Post.findOne({
     _id: req.params.postId,
-    likes: { $in: req.body.user },
+    likes: {
+      $in: req.body.user
+    },
   }).populate("comments");
 
   if (upPost) {
-    const post = await req.context.models.Post.findOneAndUpdate(
-      {
-        _id: req.params.postId,
-      },
-      { $pull: { likes: req.body.user } },
-      { new: true }
-    ).catch((error) => next(new BadRequestError(error)));
+    const post = await req.context.models.Post.findOneAndUpdate({
+      _id: req.params.postId,
+    }, {
+      $pull: {
+        likes: req.body.user
+      }
+    }, {
+      new: true
+    }).catch((error) => next(new BadRequestError(error)));
     return res.send(post);
   } else {
-    const post = await req.context.models.Post.findOneAndUpdate(
-      {
-        _id: req.params.postId,
-        likes: { $ne: req.body.user },
+    const post = await req.context.models.Post.findOneAndUpdate({
+      _id: req.params.postId,
+      likes: {
+        $ne: req.body.user
       },
-      { $push: { likes: req.body.user } },
-      { new: true }
-    ).catch((error) => next(new BadRequestError(error)));
+    }, {
+      $push: {
+        likes: req.body.user
+      }
+    }, {
+      new: true
+    }).catch((error) => next(new BadRequestError(error)));
     return res.send(post);
   }
 };
-
+/* *************************************************************************************************** */
 /* Comment Like */
 const comment_like = async (req, res, next) => {
   const upComment = await req.context.models.Comment.findOne({
     _id: req.params.commentId,
-    likes: { $in: req.body.user },
+    likes: {
+      $in: req.body.user
+    },
   });
 
   if (upComment) {
-    const comment = await req.context.models.Comment.findOneAndUpdate(
-      {
-        _id: req.params.commentId,
-      },
-      { $pull: { likes: req.body.user } },
-      { new: true }
-    ).catch((error) => next(new BadRequestError(error)));
+    const comment = await req.context.models.Comment.findOneAndUpdate({
+      _id: req.params.commentId,
+    }, {
+      $pull: {
+        likes: req.body.user
+      }
+    }, {
+      new: true
+    }).catch((error) => next(new BadRequestError(error)));
     return res.send(comment);
   } else {
-    const comment = await req.context.models.Comment.findOneAndUpdate(
-      {
-        _id: req.params.commentId,
-        likes: { $ne: req.body.user },
+    const comment = await req.context.models.Comment.findOneAndUpdate({
+      _id: req.params.commentId,
+      likes: {
+        $ne: req.body.user
       },
-      { $push: { likes: req.body.user } },
-      { new: true }
-    ).catch((error) => next(new BadRequestError(error)));
+    }, {
+      $push: {
+        likes: req.body.user
+      }
+    }, {
+      new: true
+    }).catch((error) => next(new BadRequestError(error)));
     return res.send(comment);
   }
 };
-
+/* *************************************************************************************************** */
 /* Dislike */
 const post_dislike = async (req, res, next) => {
-  const post = await req.context.models.Post.findOneAndUpdate(
-    {
-      _id: req.params.postId,
-    },
-    { $pull: { likes: req.body.user } }
-  ).catch((error) => next(new BadRequestError(error)));
+  const post = await req.context.models.Post.findOneAndUpdate({
+    _id: req.params.postId,
+  }, {
+    $pull: {
+      likes: req.body.user
+    }
+  }).catch((error) => next(new BadRequestError(error)));
 
   return res.send(post);
 };
-
+/* *************************************************************************************************** */
 /* Update selected post */
 const post_update = async (req, res, next) => {
-  const post = await req.context.models.Post.findOneAndUpdate(
-    {
-      _id: req.params.postId,
-    },
-    {
-      title: req.body.title,
-      text: req.body.text,
-      img_url: req.body.img_url,
-      user: req.body.user,
-    }
-  ).catch((error) => next(new BadRequestError(error)));
+  const post = await req.context.models.Post.findOneAndUpdate({
+    _id: req.params.postId,
+  }, {
+    title: req.body.title,
+    text: req.body.text,
+    img_url: req.body.img_url,
+    user: req.body.user,
+  }).catch((error) => next(new BadRequestError(error)));
 
   const postNew = await req.context.models.Post.findById(post._id)
     .populate(
@@ -252,14 +288,13 @@ const post_update = async (req, res, next) => {
       select: "text createdAt likes",
       populate: {
         path: "author",
-        select:
-          "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+        select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
       },
     });
 
   return res.send(postNew);
 };
-
+/* *************************************************************************************************** */
 /* Delete selected post */
 const post_delete = async (req, res) => {
   const post = await req.context.models.Post.findById(req.params.postId);

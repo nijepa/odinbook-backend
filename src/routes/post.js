@@ -17,18 +17,22 @@ import auth from "../middleware/auth.js";
 
 const router = Router();
 
-/* List of all posts */
-router.get("/", post_all)
-router.get("/:page", post_list);
-router.get("/user/:userId", post_user_list);
-router.get("/:postId", post_one);
-router.post("/", auth, post_add);
-router.post("/comment", auth, post_comment);
-router.put("/comment/:commentId", auth, post_comment_delete);
-router.put("/:postId", auth, post_update);
-router.delete("/:postId", auth, post_delete);
-router.post("/like/:postId", auth, post_like);
-router.post("/dislike/:postId", auth, post_dislike);
-router.post("/comment/like/:commentId", auth, comment_like);
+/* post end points */
+/* GET */
+router.get("/", post_all);                                    // all posts
+router.get("/:page", post_list);                              // posts per page
+router.get("/user/:userId", post_user_list);                  // posts per user
+router.get("/post/:postId", post_one);                        // post by id
+/* POST */
+router.post("/", auth, post_add);                             // add post
+router.post("/comment", auth, post_comment);                  // add post comment
+router.post("/like/:postId", auth, post_like);                // add like post
+router.post("/dislike/:postId", auth, post_dislike);          // add dislike post
+router.post("/comment/like/:commentId", auth, comment_like);  // add like comment
+/* PUT */
+router.put("/:postId", auth, post_update);                    // update post
+router.put("/comment/:commentId", auth, post_comment_delete); // update post comment
+/* DELETE */
+router.delete("/:postId", auth, post_delete);                 // delete post
 
 export default router;
