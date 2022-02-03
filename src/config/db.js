@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config.js";
+import chalk from "chalk";
 // require('dotenv').config();
 
 /**
@@ -23,7 +24,9 @@ const connectDB = () => {
       useUnifiedTopology: true,
       useFindAndModify: false,
     })
-    .then(() => console.log("Connected to MongoDB..."))
+    .then(() =>
+      console.log(chalk.bgGreen.yellowBright("Connected to MongoDB ..."))
+    )
     .catch((err) => console.error("Could not connect to MongoDB..."));
 };
 // Expose the connection

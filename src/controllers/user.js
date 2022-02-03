@@ -27,14 +27,21 @@ const users_list = async (req, res) => {
 // Register new user
 const user_signup = async (req, res, next) => {
   try {
-    const exists = await User.findOne({ email: req.body.email });
+    const exists = await User.findOne({
+      email: req.body.email,
+    });
     if (exists) {
-      return res.status(401).send({ error: "User allready exists" });
+      return res.status(401).send({
+        error: "User allready exists",
+      });
     }
     const user = new User(req.body);
     await user.save();
     const token = await user.generateAuthToken();
-    res.status(201).send({ user, token });
+    res.status(201).send({
+      user,
+      token,
+    });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -42,13 +49,18 @@ const user_signup = async (req, res, next) => {
 
 // Login registered user
 const user_login = async (req, res) => {
-  const existsEmail = await User.findOne({ email: req.body.email });
+  const existsEmail = await User.findOne({
+    email: req.body.email,
+  });
   if (!existsEmail) {
     try {
       const user = new User(req.body);
       await user.save();
       const token = await user.generateAuthToken();
-      return res.status(201).send({ user, token });
+      return res.status(201).send({
+        user,
+        token,
+      });
     } catch (error) {
       return res.status(400).send(error);
     }
@@ -57,17 +69,23 @@ const user_login = async (req, res) => {
     if (existsEmail.isSocial === true) {
       const user = existsEmail;
       const token = await user.generateAuthToken();
-      return res.send({ user, token });
+      return res.send({
+        user,
+        token,
+      });
     }
     const { email, password } = req.body;
     const user = await User.findByCredentials(email, password);
     if (!user) {
-      return res
-        .status(401)
-        .send({ error: "Login failed! Check authentication credentials" });
+      return res.status(401).send({
+        error: "Login failed! Check authentication credentials",
+      });
     }
     const token = await user.generateAuthToken();
-    res.send({ user, token });
+    res.send({
+      user,
+      token,
+    });
   } catch (error) {
     res.status(400).send(error);
   }
@@ -113,18 +131,26 @@ router.post("/me/logoutall", auth, async (req, res) => {
 const user_update = async (req, res) => {
   try {
     const existsEmail = await User.findOne({
-      _id: { $ne: req.params.userId },
+      _id: {
+        $ne: req.params.userId,
+      },
       email: req.body.email,
     });
     if (existsEmail) {
-      return res.status(401).send({ error: "Email allready exists" });
+      return res.status(401).send({
+        error: "Email allready exists",
+      });
     }
     const existsUsername = await User.findOne({
-      _id: { $ne: req.params.userId },
+      _id: {
+        $ne: req.params.userId,
+      },
       username: req.body.username,
     });
     if (existsUsername) {
-      return res.status(401).send({ error: "Username allready exists" });
+      return res.status(401).send({
+        error: "Username allready exists",
+      });
     }
     const user = await req.context.models.User.findByIdAndUpdate(
       req.params.userId,
