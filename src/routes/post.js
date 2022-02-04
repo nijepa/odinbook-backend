@@ -3,6 +3,7 @@ import {
   post_all,
   post_list,
   post_user_list,
+  post_user_likes_list,
   post_one,
   post_add,
   post_comment,
@@ -22,6 +23,7 @@ const router = Router();
 router.get("/", post_all);                                    // all posts
 router.get("/:page", post_list);                              // posts per page
 router.get("/user/:userId", post_user_list);                  // posts per user
+router.get("/posts/:userId", post_user_likes_list);           // posts liked by user
 router.get("/post/:postId", post_one);                        // post by id
 /* POST */
 router.post("/", auth, post_add);                             // add post
