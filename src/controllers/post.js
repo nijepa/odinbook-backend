@@ -83,7 +83,32 @@ const post_user_list = async (req, res) => {
     .populate(
       "user",
       "username email first_name last_name picture isSocial friends likes createdAt name user_about"
-    );
+    ).sort([
+      ["createdAt", -1]
+    ]);
+  return res.send(posts);
+};
+/* *************************************************************************************************** */
+/* List of user liked posts */
+const post_user_likes_list = async (req, res) => {
+  const posts = await req.context.models.Post.find({
+      likes: req.params.userId
+    })
+    .populate("post")
+    .populate({
+      path: "comments",
+      select: "text createdAt likes",
+      populate: {
+        path: "author",
+        select: "username email first_name last_name picture isSocial friends likes createdAt name user_about",
+      },
+    })
+    .populate(
+      "user",
+      "username email first_name last_name picture isSocial friends likes createdAt name user_about"
+    ).sort([
+      ["createdAt", -1]
+    ]);
   return res.send(posts);
 };
 /* *************************************************************************************************** */
@@ -309,6 +334,7 @@ export {
   post_all,
   post_list,
   post_user_list,
+  post_user_likes_list,
   post_one,
   post_add,
   post_comment,
