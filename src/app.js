@@ -7,7 +7,7 @@ import routes from "./routes/index.js";
 import history from "connect-history-api-fallback";
 //mon --exec babel-node
 
-import chalk from "chalk";
+//import chalk from "chalk";
 
 const app = express();
 
@@ -75,9 +75,9 @@ app.get("*", function (req, res, next) {
 connectDB().then(async () => {
   app.listen(process.env.PORT, () =>
     console.log(
-      chalk.bgYellowBright.magenta(
+      //chalk.bgYellowBright.magenta(
         `Odinbook app listening on port ${process.env.PORT} ...`
-      )
+      //)
     )
   );
 });

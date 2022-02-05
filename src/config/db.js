@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import "dotenv/config.js";
-import chalk from "chalk";
+//import chalk from "chalk";
 // require('dotenv').config();
 
 /**
@@ -25,7 +25,10 @@ const connectDB = () => {
       useFindAndModify: false,
     })
     .then(() =>
-      console.log(chalk.bgGreen.yellowBright("Connected to MongoDB ..."))
+      console.log(//chalk.bgGreen.yellowBright(
+        "Connected to MongoDB ..."
+        //)
+      )
     )
     .catch((err) => console.error("Could not connect to MongoDB..."));
 };
