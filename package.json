@@ -1,6 +1,6 @@
 {
   "name": "odinbook_backend",
-  "version": "1.4.0",
+  "version": "1.4.3",
   "description": "odinbook",
   "main": "app.js",
   "type": "module",
