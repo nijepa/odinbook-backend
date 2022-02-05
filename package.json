@@ -1,6 +1,6 @@
 {
   "name": "odinbook_backend",
-  "version": "1.0.0",
+  "version": "1.4.0",
   "description": "odinbook",
   "main": "app.js",
   "type": "module",
@@ -8,12 +8,12 @@
     "node": "14.4.0"
   },
   "scripts": {
-    "start": "nodemon src/app.js",
+    "start": "node src/app.js",
     "test": "ss"
   },
   "repository": {
     "type": "git",
-    "url": "nijepa"
+    "url": "https://github.com/nijepa/odinbook-backend/"
   },
   "keywords": [
     "odinbook"
