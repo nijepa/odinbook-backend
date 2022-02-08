@@ -17,7 +17,7 @@ const post_all = async (req, res) => {
       "username email first_name last_name picture isSocial friends likes createdAt name user_about"
     )
 
-  const favs = posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 7)
+  const favs = posts.sort((a, b) => b.likes.length - a.likes.length).slice(0, 9)
   return res.send(favs);
 };
 /* *************************************************************************************************** */
